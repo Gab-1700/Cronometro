@@ -1,4 +1,5 @@
 ﻿
+using System.Reflection.Metadata.Ecma335;
 using System.Timers;
 
 namespace Cronometro.App;
@@ -14,10 +15,9 @@ partial class Cronometro
     private const int tiempoDormido = 10;
 
     private Label label;
-    private int Milisegundo;
+    private int milisegundo;
 
     private System.Timers.Timer timer;
-
 
 
     /// <summary>
@@ -52,7 +52,6 @@ partial class Cronometro
         timer.Elapsed += ContadorSec;
 
 
-
         label = new Label();
         label.Text = "00:00.00";
         label.Font = new Font("Arial", 20, FontStyle.Bold);
@@ -68,6 +67,7 @@ partial class Cronometro
 
         Button botonRestablecer = new Button();
         botonRestablecer.Text = "Restablecer";
+        botonRestablecer.Click += DetenerCronometro;
         botonRestablecer.Location = new System.Drawing.Point(200, 150);
         this.Controls.Add(botonRestablecer);
 
@@ -75,27 +75,24 @@ partial class Cronometro
 
     private void ContadorSec(object sender, ElapsedEventArgs e)
     {
-        Milisegundo++;
-        if (Milisegundo == 100)
+        milisegundo++;
+        if (milisegundo == 100)
         {
             segundos++;
-            Milisegundo = 0;
+            milisegundo = 0;
         }
         if (segundos == 60)
         {
             minutos++;
             segundos = 0;
         }
-        label.Text = minutos + ":" + segundos + ":" + Milisegundo;
-
+        //Devolver(segundos);
+        label.Text = Devolver(minutos) + ":" + Devolver(segundos) + "." + Devolver(milisegundo);
     }
 
     private void IniciarDetenerCronometro(object sender, EventArgs e)
     {
         estoyDetenido = !estoyDetenido;
-        //this.botonInicio.Text = estoyDetenido? "Detener" : "Iniciar";
-
-        // string ui = if (estoyDetenido) return "DEt" else return "INI";
         if (estoyDetenido)
         {
             timer.Start();
@@ -107,5 +104,31 @@ partial class Cronometro
             this.botonInicio.Text = "Iniciar";
         }
     }
+
+    // codigo para concatenar y mantener el orden de los segundos y minutos
+    private string Devolver(int numero)
+    {
+        if (numero <= 9)
+        {
+            return "0" + numero.ToString();
+        }
+        else
+        {
+            return numero.ToString();
+        }
+    }
+    private void DetenerCronometro(object sender, EventArgs e)
+    {
+        timer.Stop();
+        this.minutos = 0;
+        this.segundos = 0;
+        this.milisegundo = 0;
+        label.Text = "00:00.00";
+
+        botonInicio.Text = "Iniciar";
+        estoyDetenido = false;
+
+    }
+
     #endregion
 }
